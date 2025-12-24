@@ -1,0 +1,16 @@
+@import 'tailwindcss';
+
+@theme {
+    --font-outfit: 'Outfit';
+    --font-prata: 'Prata';
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+@layer base {
+    button {
+        @apply cursor-pointer;
+    }
+}

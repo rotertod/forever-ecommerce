@@ -1,0 +1,123 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(uuid())
+  name      String     @unique
+  email     String     @unique
+  password  String
+  roleId    String
+  role      Role       @relation(fields: [roleId], references: [id])
+  createdAt DateTime   @default(now())
+  carts     Cart[]
+  orders    Order[]
+  delivery  Delivery[]
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String
+  price       Float
+  images      Image[]
+  category    String
+  subCategory String
+  sizes       Size[]
+  quantity    Int      @default(0)
+  bestseller  Boolean
+  createdAt   DateTime @default(now())
+  carts       Cart[]
+  orders      Order[]
+}
+
+model Size {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  products  Product[]
+}
+
+model Cart {
+  id        String  @id @default(uuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  size      String?
+}
+
+model Order {
+  id           String     @id @default(uuid())
+  createdDate  DateTime   @default(now())
+  userId       String
+  user         User       @relation(fields: [userId], references: [id])
+  productId    String
+  product      Product    @relation(fields: [productId], references: [id])
+  quantity     Int
+  sizeProduct  String?
+  statusId     String
+  status       Status     @relation(fields: [statusId], references: [id])
+  paymentId    String
+  payment      Payment    @relation(fields: [paymentId], references: [id])
+  deliveryInfo Delivery[]
+}
+
+model Status {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  createdDate DateTime @default(now())
+  orders      Order[]
+}
+
+model Delivery {
+  id        String @id @default(uuid())
+  firstName String
+  lastName  String
+  email     String
+  street    String
+  city      String
+  state     String
+  zipCode   String
+  country   String
+  phone     String
+  userId    String
+  user      User   @relation(fields: [userId], references: [id])
+  orderId   String
+  order     Order  @relation(fields: [orderId], references: [id])
+}
+
+model Payment {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  orders    Order[]
+}
+
+model Image {
+  id        String   @id @default(uuid())
+  url       String   @unique
+  createdAt DateTime @default(now())
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id])
+}
+
+model Role {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  users     User[]
+}
